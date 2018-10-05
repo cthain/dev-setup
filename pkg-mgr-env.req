@@ -1,0 +1,13 @@
+# PKG_MGR_UPD_CMD is the command used to update the package repository information for the associated package manager.
+# Typically something like:
+#     `sudo apt update` or `sudo yum update`
+# Install scripts may use this command but the top level setup script always executes this command prior to attempting to install
+# any packages. Where this may come in handy is if a setup script needs to install a custom third-party package repository.
+PKG_MGR_UPD_CMD
+
+# PKG_UPGRADE_CMD is the command used to upgrade existing packages. This command is run by the top-level setup script immediately
+# after upating the package repository index to upgrade the whole system.
+PKG_UPGRADE_CMD
+
+# PKG_INSTALL_CMD is the command used to install a package.
+PKG_INSTALL_CMD
