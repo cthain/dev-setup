@@ -100,9 +100,6 @@ validateEnv $(cat pkg-mgr-env.req | sed '/^#/d') || exit 1
 # update the package manager
 $PKG_MGR_UPD_CMD
 
-# upgrade the whole system
-$PKG_UPGRADE_CMD
-
 SUCCESS=""
 SKIPPED=""
 FAILED=""
@@ -113,6 +110,9 @@ do
     pkgName=$(echo "$pkg" | sed 's/.*\/\(.*\)\.sh/\1/')
     ans=y
     if [ "$DEV_SETUP_INTERACTIVE" != "FALSE" ]; then
+        echo ""
+        grep '^#:' $pkg
+        echo ""
         echo -n "Do you want to install $pkgName? [Y/n]: "
         read ans
     fi
