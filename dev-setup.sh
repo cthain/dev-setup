@@ -35,12 +35,36 @@ warn() {
 }
 
 dbg() {
-    if [ -n "$DEV_SETUP_DBG" ]; then
+    if [ -n "$DBG" ]; then
         # log dbg to stderr so it doesn't upset the function returns
         log "DBG  $*" 1>&2
     fi
 }
 
+##
+# Indicates if the given string is in the array
+#
+inArray() {
+    needle=$1
+    shift
+    for haystack in $@
+    do
+        test "$needle" == "$haystack" && return 0
+    done
+    return 1
+}
+
+lower() {
+    echo $@ | tr [:upper:] [:lower:]
+}
+
+upper() {
+    echo $@ | tr [:lower:] [:upper:]
+}
+
+##
+# Log install stats
+#
 stats() {
     status=$1
     shift
@@ -51,7 +75,7 @@ stats() {
     done
 }
 
-#
+##
 # Validate an environment configuration
 #
 validateEnv() {
@@ -63,7 +87,7 @@ validateEnv() {
     return 0
 }
 
-#
+##
 # Get the system package manager and validate the configuration.
 #
 getPkgMgr() {
@@ -79,7 +103,28 @@ getPkgMgr() {
     done
 }
 
+##
+# Get the list of packages to install. Look in the gen folder and the specific pkg mgr folder and favour the pkg mgr folder.
 #
+getPkgs() {
+    genPkgs=$(find ./pkgs/gen -name "*.sh" | sort -u)
+    pkgs=""
+    for genPkg in $genPkgs
+    do
+        dbg "found gen package $genPkg"
+        genPkgName=$(basename $genPkg)
+        if [ -f "./pkgs/$pkgMgr/$genPkgName" ]; then
+            dbg "found $pkgMgr package for $genPkgName, using it instead of the gen package"
+            pkgs="$pkgs ./pkgs/$pkgMgr/$genPkgName"
+        else
+            dbg "using gen package"
+            pkgs="$pkgs $genPkg"
+        fi
+    done
+    echo $pkgs
+}
+
+##
 # main
 #
 while [ $# -gt 0 ]
@@ -105,13 +150,13 @@ SKIPPED=""
 FAILED=""
 
 # install packages    
-for pkg in $(find ./pkgs -name "*.sh" | sort -u)
+for pkg in $(getPkgs)
 do
     pkgName=$(echo "$pkg" | sed 's/.*\/\(.*\)\.sh/\1/')
     ans=y
     if [ "$DEV_SETUP_INTERACTIVE" != "FALSE" ]; then
         echo ""
-        grep '^#:' $pkg
+        grep '^#:' $pkg | sed 's/^#:\(.*\)/\1/'
         echo ""
         echo -n "Do you want to install $pkgName? [Y/n]: "
         read ans

@@ -1,4 +1,15 @@
-#: Docker Community Edition is a container development and management platform.
+#:Docker Community Edition is a container development and management platform.
+
+dockerVer=$(docker -v)
+
+if [ -n "$dockerVer" ]; then
+    echo "$dockerVer is already installed. Do you want to re-install it? [y/N]: "
+    read ans
+    ans=$(lower $ans)
+    if [ "$ans" != "y" ]; then
+        exit 0
+    fi
+fi
 
 $PKG_INSTALL_CMD apt-transport-https ca-certificates curl software-properties-common
 if [ $? -ne 0 ]; then

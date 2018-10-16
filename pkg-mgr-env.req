@@ -19,6 +19,9 @@
 # any packages. Where this may come in handy is if a setup script needs to install a custom third-party package repository.
 PKG_MGR_UPD_CMD
 
+# PKG_LIST_CMD is the command used to tell if a program is already installed by the package manager.
+PKG_LIST_CMD
+
 # PKG_UPGRADE_CMD is the command used to upgrade existing packages. This command is run by the top-level setup script immediately
 # after upating the package repository index to upgrade the whole system.
 PKG_UPGRADE_CMD
